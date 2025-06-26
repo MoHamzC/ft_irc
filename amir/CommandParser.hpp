@@ -7,8 +7,10 @@
 #include "Client.hpp"
 #include "AuthHandler.hpp"
 
-// Forward declaration pour pouvoir utiliser splitParams dans IRCMessage
+// Forward declarations
 class CommandParser;
+class Channel;
+class ChannelManager;
 
 struct IRCMessage {
     std::string prefix;
@@ -23,6 +25,7 @@ class CommandParser {
 private:
     AuthHandler *_authHandler;
     std::map<int, Client*> *_clients;
+    ChannelManager *_channelManager; // AJOUT NÉCESSAIRE
     
     // Parsing
     IRCMessage parseMessage(const std::string& raw);
@@ -31,8 +34,17 @@ private:
     bool handleAuthCommand(Client* client, const IRCMessage& msg);
     bool handleGeneralCommand(Client* client, const IRCMessage& msg);
     
+    // NOUVELLES COMMANDES OBLIGATOIRES
+    bool handleJoin(Client* client, const std::vector<std::string>& params);
+    bool handlePart(Client* client, const std::vector<std::string>& params);
+    bool handlePrivmsg(Client* client, const std::vector<std::string>& params);
+    bool handleKick(Client* client, const std::vector<std::string>& params);
+    bool handleInvite(Client* client, const std::vector<std::string>& params);
+    bool handleTopic(Client* client, const std::vector<std::string>& params);
+    bool handleMode(Client* client, const std::vector<std::string>& params);
+
 public:
-    CommandParser(AuthHandler *authHandler, std::map<int, Client*> *clients);
+    CommandParser(AuthHandler *authHandler, std::map<int, Client*> *clients, ChannelManager *channelManager);
     ~CommandParser();
     
     // Méthode statique pour être utilisée par IRCMessage
