@@ -1,0 +1,32 @@
+# Compiled Object files
+*.o
+*.d
+
+# Executables
+ft_irc
+ircserv
+
+# Build directories
+obj/
+.deps/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Test outputs
+test_output/

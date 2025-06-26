@@ -41,12 +41,15 @@ $(shell mkdir -p $(OBJ_DIR) $(DEP_DIR))
 INCLUDES			= -I.
 
 # ================================== SOURCES ==================================
-# All source files (based on your provided files)
-SRCS				= server_integration_example.cpp \
+# All source files (updated with fusion)
+SRCS				= main.cpp \
+					  Server.cpp \
 					  Client.cpp \
 					  ClientManager.cpp \
 					  AuthHandler.cpp \
-					  CommandParser.cpp
+					  CommandParser.cpp \
+					  Channel.cpp \
+					  ChannelManager.cpp
 
 # If you have a separate main.cpp, uncomment and add it:
 # SRCS				+= main.cpp

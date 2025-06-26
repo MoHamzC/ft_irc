@@ -3,6 +3,10 @@
 #include <cctype>
 #include <sstream>
 
+// Forward declaration pour éviter l'include
+class Server;
+class ChannelManager;
+
 // Constructeur
 AuthHandler::AuthHandler(const std::string& password, std::map<int, Client*> *clients, Server *server) 
     : _serverPassword(password), _clients(clients), _server(server) {}
@@ -131,13 +135,13 @@ bool AuthHandler::handleNick(Client* client, const std::vector<std::string>& par
     
     // Si le client a déjà un nickname, notifier le changement
     if (!client->getNickname().empty() && client->isRegistered()) {
-        std::string oldPrefix = client->getPrefix();
+        std::string oldNick = client->getNickname();
         client->setNickname(newNick);
-        std::string message = oldPrefix + " NICK :" + newNick;
         
-        // Envoyer à tous les clients dans les mêmes canaux
-        // (Cette partie sera gérée par la partie 3 - Canaux)
-        client->sendMessage(message);
+        // Notifier tous les canaux du changement de nick
+        // (sera géré par le serveur principal lors du traitement)
+        std::string nickMsg = ":" + oldNick + "!" + client->getUsername() + "@" + client->getHostname() + " NICK :" + newNick;
+        client->sendMessage(nickMsg);
     } else {
         client->setNickname(newNick);
         

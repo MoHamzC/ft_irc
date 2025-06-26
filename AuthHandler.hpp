@@ -7,6 +7,7 @@
 #include <map>
 
 class Server; // Forward declaration
+class ChannelManager; // Forward declaration
 
 class AuthHandler {
 private:

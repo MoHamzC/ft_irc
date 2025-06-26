@@ -1,4 +1,5 @@
 #include "ClientManager.hpp"
+#include "Server.hpp"
 #include <iostream>
 #include <algorithm>
 #include <unistd.h>
@@ -7,7 +8,8 @@
 ClientManager::ClientManager(Server *server, const std::string& password, int timeout)
     : _server(server), _timeout(timeout) {
     _authHandler = new AuthHandler(password, &_clients, server);
-    _commandParser = new CommandParser(_authHandler, &_clients);
+    // Note: _commandParser sera initialisé après la création du ChannelManager
+    _commandParser = NULL;
 }
 
 // Destructeur
@@ -50,12 +52,11 @@ void ClientManager::removeClient(int fd) {
     if (client->isRegistered()) {
         std::cout << "Client " << client->getNickname() << " disconnected (fd: " << fd << ")" << std::endl;
         
-        // Notifier les autres clients dans les mêmes canaux
-        // (Cette partie sera gérée par la partie 3 - Canaux)
-        
-        // Envoyer QUIT à tous les canaux
-        std::string quitMsg = client->getPrefix() + " QUIT :Client disconnected";
-        // broadcast à implémenter selon les canaux
+        // Notifier les canaux de la déconnexion
+        if (_server && _server->getChannelManager()) {
+            _server->getChannelManager()->broadcastQuit(client, "Client disconnected");
+            _server->getChannelManager()->removeClientFromAllChannels(client);
+        }
     } else {
         std::cout << "Unregistered client disconnected (fd: " << fd << ")" << std::endl;
     }
@@ -184,4 +185,12 @@ void ClientManager::sendToNick(const std::string& nickname, const std::string& m
 // Getter pour les clients
 const std::map<int, Client*>& ClientManager::getClients() const {
     return _clients;
+}
+
+// Initialisation différée du CommandParser
+void ClientManager::initializeCommandParser(ChannelManager *channelManager) {
+    if (_commandParser) {
+        delete _commandParser;
+    }
+    _commandParser = new CommandParser(_authHandler, &_clients, channelManager);
 }

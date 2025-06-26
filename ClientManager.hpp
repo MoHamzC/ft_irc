@@ -46,6 +46,9 @@ public:
     
     // Getters
     const std::map<int, Client*>& getClients() const;
+    
+    // Initialisation différée du CommandParser
+    void initializeCommandParser(ChannelManager *channelManager);
 };
 
 #endif
