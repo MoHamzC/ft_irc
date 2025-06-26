@@ -38,8 +38,8 @@ void ClientManager::addClient(int fd) {
     std::cout << "New client connected (fd: " << fd << ")" << std::endl;
     
     // Envoyer un message de notification de connexion
-    newClient->sendMessage("NOTICE AUTH :*** Looking up your hostname...");
-    newClient->sendMessage("NOTICE AUTH :*** Found your hostname");
+    newClient->sendMessage("NOTICE AUTH :*** Loading...");
+    newClient->sendMessage("NOTICE AUTH :*** Connected!");
 }
 
 // Supprimer un client
