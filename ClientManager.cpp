@@ -1,5 +1,6 @@
 #include "ClientManager.hpp"
 #include "Server.hpp"
+#include "AuthHandler.hpp"
 #include <iostream>
 #include <algorithm>
 #include <unistd.h>
@@ -175,7 +176,7 @@ void ClientManager::broadcastToAll(const std::string& message) {
 // Envoyer un message à un client par nickname
 void ClientManager::sendToNick(const std::string& nickname, const std::string& message) {
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        if (it->second->getNickname() == nickname && it->second->isRegistered()) {
+        if (AuthHandler::compareNicknames(it->second->getNickname(), nickname) && it->second->isRegistered()) {
             it->second->sendMessage(message);
             return;
         }

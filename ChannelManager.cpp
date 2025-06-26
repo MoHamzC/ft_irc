@@ -1,5 +1,6 @@
 #include "ChannelManager.hpp"
 #include "Server.hpp"
+#include "AuthHandler.hpp"
 #include <algorithm>
 #include <cstdlib>
 #include <sstream>
@@ -111,8 +112,7 @@ bool ChannelManager::joinChannel(Client* client, const std::string& channelName,
     
     // Notifier tous les membres du JOIN
     std::string joinMsg = client->getPrefix() + " JOIN :" + channelName;
-    channel->broadcast(joinMsg, NULL); // Envoyer à tous y compris le client
-    client->sendMessage(joinMsg);
+    channel->broadcast(joinMsg, NULL); // Envoyer à tous y compris le client qui rejoint
     
     // Envoyer topic si défini
     if (!channel->getTopic().empty()) {
@@ -188,7 +188,7 @@ bool ChannelManager::kickFromChannel(Client* kicker, const std::string& channelN
     Client* target = NULL;
     for (std::map<int, Client*>::const_iterator it = _server->getClientManager()->getClients().begin(); 
          it != _server->getClientManager()->getClients().end(); ++it) {
-        if (it->second->getNickname() == targetNick && it->second->isRegistered()) {
+        if (AuthHandler::compareNicknames(it->second->getNickname(), targetNick) && it->second->isRegistered()) {
             target = it->second;
             break;
         }
@@ -199,8 +199,7 @@ bool ChannelManager::kickFromChannel(Client* kicker, const std::string& channelN
     
     // Envoyer le message KICK
     std::string kickMsg = kicker->getPrefix() + " KICK " + channelName + " " + targetNick + " :" + reason;
-    channel->broadcast(kickMsg, NULL); // À tous y compris le target
-    target->sendMessage(kickMsg);
+    channel->broadcast(kickMsg, NULL); // À tous y compris le target qui est kicked
     
     // Retirer du canal
     channel->removeMember(target);
@@ -228,7 +227,7 @@ bool ChannelManager::inviteToChannel(Client* inviter, const std::string& channel
     Client* target = NULL;
     for (std::map<int, Client*>::const_iterator it = _server->getClientManager()->getClients().begin(); 
          it != _server->getClientManager()->getClients().end(); ++it) {
-        if (it->second->getNickname() == targetNick && it->second->isRegistered()) {
+        if (AuthHandler::compareNicknames(it->second->getNickname(), targetNick) && it->second->isRegistered()) {
             target = it->second;
             break;
         }
@@ -380,7 +379,7 @@ bool ChannelManager::setChannelMode(Client* client, const std::string& channelNa
                     // Trouver le client cible
                     for (std::map<int, Client*>::const_iterator it = _server->getClientManager()->getClients().begin(); 
                          it != _server->getClientManager()->getClients().end(); ++it) {
-                        if (it->second->getNickname() == targetNick && it->second->isRegistered()) {
+                        if (AuthHandler::compareNicknames(it->second->getNickname(), targetNick) && it->second->isRegistered()) {
                             target = it->second;
                             break;
                         }

@@ -27,6 +27,10 @@ public:
     AuthHandler(const std::string& password, std::map<int, Client*> *clients, Server *server);
     ~AuthHandler();
     
+    // Utilitaires publics pour comparaison insensible à la casse
+    static std::string toLowerCase(const std::string& str);
+    static bool compareNicknames(const std::string& nick1, const std::string& nick2);
+    
     // Commandes d'authentification
     bool handlePass(Client* client, const std::vector<std::string>& params);
     bool handleNick(Client* client, const std::vector<std::string>& params);

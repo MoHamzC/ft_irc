@@ -1,5 +1,6 @@
 #include "CommandParser.hpp"
 #include "ChannelManager.hpp"
+#include "AuthHandler.hpp"
 #include <sstream>
 #include <algorithm>
 #include <iostream>
@@ -202,7 +203,7 @@ bool CommandParser::handlePrivmsg(Client* client, const std::vector<std::string>
     // Message privé vers un utilisateur
     Client* targetClient = NULL;
     for (std::map<int, Client*>::iterator it = _clients->begin(); it != _clients->end(); ++it) {
-        if (it->second->getNickname() == target && it->second->isRegistered()) {
+        if (AuthHandler::compareNicknames(it->second->getNickname(), target) && it->second->isRegistered()) {
             targetClient = it->second;
             break;
         }
@@ -266,7 +267,7 @@ bool CommandParser::handleMode(Client* client, const std::vector<std::string>& p
     std::string target = params[0];
     
     // Mode utilisateur
-    if (target == client->getNickname()) {
+    if (AuthHandler::compareNicknames(target, client->getNickname())) {
         _authHandler->sendNumericReply(client, 221, "+");
         return true;
     }

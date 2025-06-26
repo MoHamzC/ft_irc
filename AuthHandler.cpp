@@ -1,6 +1,6 @@
 #include "AuthHandler.hpp"
 #include <algorithm>
-#include <cctype>
+#include <iostream>
 #include <sstream>
 
 // Forward declaration pour éviter l'include
@@ -36,10 +36,26 @@ bool AuthHandler::isValidNickname(const std::string& nick) const {
     return true;
 }
 
+// Convertir en minuscules pour comparaison insensible à la casse
+std::string AuthHandler::toLowerCase(const std::string& str) {
+    std::string result = str;
+    for (size_t i = 0; i < result.length(); ++i) {
+        if (result[i] >= 'A' && result[i] <= 'Z') {
+            result[i] = result[i] + ('a' - 'A');
+        }
+    }
+    return result;
+}
+
+// Comparer deux nicknames en ignorant la casse
+bool AuthHandler::compareNicknames(const std::string& nick1, const std::string& nick2) {
+    return toLowerCase(nick1) == toLowerCase(nick2);
+}
+
 // Vérifier si le nickname est déjà utilisé
 bool AuthHandler::isNicknameInUse(const std::string& nick) const {
     for (std::map<int, Client*>::iterator it = _clients->begin(); it != _clients->end(); ++it) {
-        if (it->second->getNickname() == nick)
+        if (compareNicknames(it->second->getNickname(), nick))
             return true;
     }
     return false;
