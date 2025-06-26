@@ -68,18 +68,43 @@ send_irc_commands "Channel Modes" \
     "MODE #test +k secret123" \
     "MODE #test +l 10"
 
-# Test 5: Opérateurs et KICK
-send_irc_commands "Operator Functions" \
-    "PASS $SERVER_PASS" \
-    "NICK admin" \
-    "USER admin 0 * :Admin User" \
-    "JOIN #moderated" \
-    "PASS $SERVER_PASS" \
-    "NICK user1" \
-    "USER user1 0 * :Regular User" \
-    "JOIN #moderated" \
-    "MODE #moderated +o user1" \
-    "KICK #moderated user1 :Testing kick"
+# Test 5: Opérateurs et KICK (connexions séparées)
+echo "📋 Test: Operator Functions (Multiple Connections)"
+echo "Starting admin connection:"
+(
+    echo -e "PASS $SERVER_PASS\r"
+    echo -e "NICK admin\r"
+    echo -e "USER admin 0 * :Admin User\r"
+    echo -e "JOIN #moderated\r"
+    sleep 1
+) | timeout 3 nc "$SERVER_HOST" "$SERVER_PORT" &
+
+sleep 2
+
+echo "Starting user1 connection:"
+(
+    echo -e "PASS $SERVER_PASS\r"
+    echo -e "NICK user1\r" 
+    echo -e "USER user1 0 * :Regular User\r"
+    echo -e "JOIN #moderated\r"
+    sleep 1
+) | timeout 3 nc "$SERVER_HOST" "$SERVER_PORT" &
+
+sleep 2
+
+echo "Admin kicks user1:"
+(
+    echo -e "PASS $SERVER_PASS\r"
+    echo -e "NICK admin2\r"
+    echo -e "USER admin2 0 * :Admin User 2\r"
+    echo -e "JOIN #moderated\r"
+    echo -e "MODE #moderated +o admin2\r"
+    echo -e "KICK #moderated user1 :Testing kick\r"
+    sleep 1
+) | timeout 3 nc "$SERVER_HOST" "$SERVER_PORT"
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo
 
 echo "✅ All tests completed!"
 echo "📊 Features tested:"

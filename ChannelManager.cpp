@@ -287,8 +287,7 @@ bool ChannelManager::setChannelTopic(Client* client, const std::string& channelN
     
     // Notifier tous les membres
     std::string topicMsg = client->getPrefix() + " TOPIC " + channelName + " :" + topic;
-    channel->broadcast(topicMsg, NULL); // À tous y compris le client
-    client->sendMessage(topicMsg);
+    channel->broadcast(topicMsg, NULL); // À tous y compris le client qui change le topic
     
     return true;
 }
@@ -402,8 +401,7 @@ bool ChannelManager::setChannelMode(Client* client, const std::string& channelNa
     // Notifier tous les membres du changement de mode
     if (!appliedModes.empty()) {
         std::string modeMsg = client->getPrefix() + " MODE " + channelName + " " + appliedModes + appliedParams;
-        channel->broadcast(modeMsg, NULL);
-        client->sendMessage(modeMsg);
+        channel->broadcast(modeMsg, NULL); // À tous y compris le client qui change le mode
     }
     
     return true;
