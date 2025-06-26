@@ -92,7 +92,10 @@ void ClientManager::processClientMessages(int fd) {
     if (!client)
         return;
     
-    _commandParser->processClientBuffer(client);
+    // Si processClientBuffer retourne false, le client doit être déconnecté
+    if (!_commandParser->processClientBuffer(client)) {
+        removeClient(fd);
+    }
 }
 
 // Vérifier les timeouts

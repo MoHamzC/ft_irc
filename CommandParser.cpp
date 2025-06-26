@@ -120,12 +120,7 @@ bool CommandParser::handleGeneralCommand(Client* client, const IRCMessage& msg) 
         return true;
     }
     else if (msg.command == "QUIT") {
-        std::string reason = "Client Quit";
-        if (!msg.params.empty())
-            reason = msg.params[0];
-        
-        std::cout << "Client " << client->getNickname() << " quit: " << reason << std::endl;
-        return false; // Indique que le client doit être déconnecté
+        return handleQuit(client, msg.params);
     }
     else if (msg.command == "JOIN") {
         return handleJoin(client, msg.params);
@@ -290,14 +285,15 @@ bool CommandParser::handleMode(Client* client, const std::vector<std::string>& p
 }
 
 // Traiter le buffer d'un client
-void CommandParser::processClientBuffer(Client* client) {
+bool CommandParser::processClientBuffer(Client* client) {
     std::string message;
     while (!(message = client->extractMessage()).empty()) {
         if (!processMessage(client, message)) {
             // Si processMessage retourne false, le client doit être déconnecté
-            break;
+            return false;
         }
     }
+    return true; // Le client peut continuer
 }
 
 // Convertir en majuscules
@@ -305,4 +301,26 @@ std::string CommandParser::toUpper(const std::string& str) {
     std::string result = str;
     std::transform(result.begin(), result.end(), result.begin(), ::toupper);
     return result;
+}
+
+// Commande QUIT
+bool CommandParser::handleQuit(Client* client, const std::vector<std::string>& params) {
+    if (!client)
+        return false;
+    
+    // Extraire la raison du QUIT
+    std::string reason = "Client Quit";
+    if (!params.empty())
+        reason = params[0];
+    
+    std::cout << "Client " << client->getNickname() << " quit: " << reason << std::endl;
+    
+    // Si le client est enregistré, notifier les canaux
+    if (client->isRegistered() && _channelManager) {
+        _channelManager->broadcastQuit(client, reason);
+        _channelManager->removeClientFromAllChannels(client);
+    }
+    
+    // Retourner false pour indiquer que le client doit être déconnecté
+    return false;
 }

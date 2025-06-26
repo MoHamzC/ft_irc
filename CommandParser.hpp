@@ -42,6 +42,7 @@ private:
     bool handleInvite(Client* client, const std::vector<std::string>& params);
     bool handleTopic(Client* client, const std::vector<std::string>& params);
     bool handleMode(Client* client, const std::vector<std::string>& params);
+    bool handleQuit(Client* client, const std::vector<std::string>& params);
 
 public:
     CommandParser(AuthHandler *authHandler, std::map<int, Client*> *clients, ChannelManager *channelManager);
@@ -54,7 +55,8 @@ public:
     bool processMessage(Client* client, const std::string& message);
     
     // Traiter tous les messages en buffer d'un client
-    void processClientBuffer(Client* client);
+    // Retourne false si le client doit être déconnecté
+    bool processClientBuffer(Client* client);
     
     // Utilitaires
     std::string toUpper(const std::string& str);
