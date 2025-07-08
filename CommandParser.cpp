@@ -290,7 +290,10 @@ bool CommandParser::processClientBuffer(Client* client) {
     while (!(message = client->extractMessage()).empty()) {
         if (!processMessage(client, message)) {
             // Si processMessage retourne false, le client doit être déconnecté
-            return false;
+			if (message == "QUIT") {
+					return false; // Le client doit être déconnecté
+				}
+            return true;
         }
     }
     return true; // Le client peut continuer
